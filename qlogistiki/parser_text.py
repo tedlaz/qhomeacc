@@ -1,8 +1,9 @@
 """Module to parse text accounting books"""
+from collections import defaultdict, namedtuple
 from decimal import Decimal
-from collections import namedtuple, defaultdict
-from .utils import gr2dec
+
 from .transaction import Transaction
+from .utils import gr2dec
 
 ValPoint = namedtuple("ValPoint", "date account delta")
 Anoigma = namedtuple("Anoigma", "date account value")
@@ -14,11 +15,13 @@ def parse(file):
     Parser for accounting text files
     """
     trn = Transaction("1000-01-01", "", "", "")
+    dat = ""
     company_afm = ""
     company_name = ""
     transactions = []
     validations = []
     anoigma = []
+    valid_accounts = set()
     accounts = defaultdict(Decimal)
     tran_total = 0
 
@@ -42,6 +45,11 @@ def parse(file):
             company_afm = co_afm
             company_name = " ".join(co_name)
 
+        # Λογαριασμοί ισχύοντες
+        elif rline.startswith('+'):
+            _, valid_account = rline.split()
+            valid_accounts.add(valid_account)
+
         # Εγγραφές ανοίγματος
         elif rline.startswith("<"):
             _, adate, accounta, value = rline.split()
@@ -57,7 +65,10 @@ def parse(file):
         elif rline[:10].replace("-", "").isnumeric():
             # if status == LINE:
             #     self.add_transaction(trn)
-            dat, par, _, per, *afma = rline.split('"')
+            try:
+                dat, par, _, per, *afma = rline.split('"')
+            except:
+                raise ValueError(f"Error parsing line: {rline}")
             dat = dat.strip()
             par = par.strip()
             per = per.strip()
@@ -69,9 +80,11 @@ def parse(file):
         # Γραμμή λεπτομέρειας
         elif rline[:2] == "  ":  # Line detail
             accval, *sxolio = rline.split("#")
-            sxolio = sxolio[0] if sxolio else ""
+            sxolio = sxolio[0].strip() if sxolio else ""
             account, *txtval = accval.split()
             val = gr2dec(txtval[0]) if txtval else 0
+            if account not in valid_accounts:
+                raise ValueError(f"Invalid account: {account}, date: {dat}")
             # Εδώ δημιουργείται αυτόματα ο λογαριασμός ΦΠΑ
             if account == FPA_PREFIX:
                 account = f"{FPA_PREFIX}.{trn.last_account.name}"
