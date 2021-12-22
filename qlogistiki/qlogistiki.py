@@ -2,9 +2,9 @@
 import os
 import sys
 
-from PyQt5 import QtCore as qc
-from PyQt5 import QtGui as qg
-from PyQt5 import QtWidgets as qw
+from PyQt6 import QtCore as qc
+from PyQt6 import QtGui as qg
+from PyQt6 import QtWidgets as qw
 
 from . import data_operations_text as dot
 
@@ -33,14 +33,14 @@ class Dmodel(qc.QAbstractTableModel):
         return len(self.mdata.headers)
 
     def headerData(self, section, orientation, role):
-        if role == qc.Qt.DisplayRole:
-            if orientation == qc.Qt.Horizontal:
+        if role == qc.Qt.ItemDataRole.DisplayRole:
+            if orientation == qc.Qt.Orientation.Horizontal:
                 return self.mdata.headers[section]
             else:
                 pass
                 # return section + 1
-        if role == qc.Qt.TextAlignmentRole:
-            return qc.Qt.AlignCenter
+        if role == qc.Qt.ItemDataRole.TextAlignmentRole:
+            return qc.Qt.AlignmentFlag.AlignCenter
 
     # def index(self, row, column, parent):
     #     return qc.QModelIndex()
@@ -48,24 +48,24 @@ class Dmodel(qc.QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return None
-        if role == qc.Qt.DisplayRole:
+        if role == qc.Qt.ItemDataRole.DisplayRole:
             if self.mdata.types[index.column()] == 1:
                 return str(self.mdata.values[index.row()][index.column()])
             else:
                 return self.mdata.values[index.row()][index.column()]
-        if role == qc.Qt.TextAlignmentRole:
+        if role == qc.Qt.ItemDataRole.TextAlignmentRole:
             if self.mdata.aligns[index.column()] == 1:
-                return qc.Qt.AlignLeft
+                return qc.Qt.AlignmentFlag.AlignLeft
             elif self.mdata.aligns[index.column()] == 2:
-                return qc.Qt.AlignCenter
+                return qc.Qt.AlignmentFlag.AlignCenter
             elif self.mdata.aligns[index.column()] == 3:
-                return qc.Qt.AlignRight
+                return qc.Qt.AlignmentFlag.AlignRight
 
 
 class Dialog(qw.QWidget):
     def __init__(self, filename, book, parent=None):
         super().__init__(parent)
-        self.parent = parent
+        self.parent1 = parent
         self.book = book
         self.checked_account = ""
         mainlayout = qw.QVBoxLayout(self)
@@ -74,7 +74,7 @@ class Dialog(qw.QWidget):
         mainlayout.addLayout(hlayout)
         leftv = qw.QVBoxLayout()
         rightv = qw.QSplitter()
-        rightv.setOrientation(qc.Qt.Vertical)
+        rightv.setOrientation(qc.Qt.Orientation.Vertical)
         hlayout.addLayout(leftv)
         hlayout.addWidget(rightv)
 
@@ -84,8 +84,10 @@ class Dialog(qw.QWidget):
         self.iso.setFont(font)
 
         self.iso.setMaximumWidth(450)
-        self.iso.setSelectionBehavior(qw.QAbstractItemView.SelectRows)
-        self.iso.setSelectionMode(qw.QAbstractItemView.SingleSelection)
+        self.iso.setSelectionBehavior(
+            qw.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.iso.setSelectionMode(
+            qw.QAbstractItemView.SelectionMode.SingleSelection)
         self.iso.setModel(Dmodel(self.book.isozygio_model()))
         self.iso.resizeColumnsToContents()
         self.iso.resizeRowsToContents()
@@ -94,7 +96,7 @@ class Dialog(qw.QWidget):
         leftv.addWidget(bvalidate)
 
         self.lbl = qw.QLabel(rightv)
-        self.lbl.setAlignment(qc.Qt.AlignCenter)
+        self.lbl.setAlignment(qc.Qt.AlignmentFlag.AlignCenter)
         bold_font = qg.QFont()
         bold_font.setFamily("Arial")
         bold_font.setBold(True)
@@ -106,10 +108,11 @@ class Dialog(qw.QWidget):
         self.tbl.setFont(font)
         self.tbl.setWordWrap(True)
         self.tbl.setAlternatingRowColors(True)
-        self.tbl.setSelectionMode(qw.QAbstractItemView.SingleSelection)
+        self.tbl.setSelectionMode(
+            qw.QAbstractItemView.SelectionMode.SingleSelection)
         self.setWindowTitle("Ισοζύγιο Λογαριασμών")
-        if self.parent:
-            self.parent.setWindowTitle(f"Ισοζύγιο Λογαριασμών ({filename})")
+        if self.parent1:
+            self.parent1.setWindowTitle(f"Ισοζύγιο Λογαριασμών ({filename})")
         # Connections
         bvalidate.clicked.connect(self.validate_ypoloipa)
         # self.sbar.some_acc_clicked.connect(self.refresh_model)
@@ -177,7 +180,7 @@ class Dialog(qw.QWidget):
 class MainWindow(qw.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setAttribute(qc.Qt.WA_DeleteOnClose)
+        self.setAttribute(qc.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.settings = qc.QSettings()
         self.setMinimumSize(1300, 700)
         self.createMenus()
@@ -203,9 +206,8 @@ class MainWindow(qw.QMainWindow):
         self.setCentralWidget(self.dlg)
 
     def createMenus(self):
-        self.openAct = qw.QAction(
-            "Open", self, statusTip="Open file", triggered=self.open
-        )
+        self.openAct = qg.QAction("Open", self)
+        self.openAct.triggered.connect(self.open)
         self.filemenu = self.menuBar().addMenu("&File")
         self.filemenu.addAction(self.openAct)
 
@@ -228,7 +230,7 @@ def main():
     app.setApplicationName("qlogistiki")
     dlg = MainWindow()
     dlg.show()
-    sys.exit(app.exec_())
+    app.exec()
 
 
 if __name__ == "__main__":
