@@ -1,10 +1,15 @@
 import os
-from .parser_text import parse
+
 from .book import Book
+from .parser_text import parse
 
 
 def load_from_text(text_file):
-    return Book(*parse(text_file))
+    try:
+        book = Book(*parse(text_file))
+        return book, True
+    except ValueError as err:
+        return None, err
 
 
 def save2text(book, destination_file):

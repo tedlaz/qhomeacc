@@ -63,13 +63,11 @@ class Dmodel(qc.QAbstractTableModel):
 
 
 class Dialog(qw.QWidget):
-    def __init__(self, filename, parent=None):
+    def __init__(self, filename, book, parent=None):
         super().__init__(parent)
         self.parent = parent
-        self.book = None
+        self.book = book
         self.checked_account = ""
-        if os.path.isfile(filename):
-            self.book = dot.load_from_text(filename)
         mainlayout = qw.QVBoxLayout()
         self.setLayout(mainlayout)
         hlayout = qw.QHBoxLayout()
@@ -189,14 +187,19 @@ class MainWindow(qw.QMainWindow):
         filename = self.settings.value("filename", defaultValue=None)
         if filename:
             if os.path.isfile(filename):
-                self.init_vals(filename)
-                return filename
+                book, err = dot.load_from_text(filename)
+                if book:
+                    self.init_vals(filename, book)
+                    return filename
+                else:
+                    msg = f'file {filename} has errors:\n{err}'
+                    qw.QMessageBox.critical(self, "Book Error", msg)
             else:
                 self.setWindowTitle(f"Το {filename} δεν είναι διαθέσιμο")
         return None
 
-    def init_vals(self, filename):
-        self.dlg = Dialog(filename, self)
+    def init_vals(self, filename, book):
+        self.dlg = Dialog(filename, book, self)
         self.setCentralWidget(self.dlg)
 
     def createMenus(self):
