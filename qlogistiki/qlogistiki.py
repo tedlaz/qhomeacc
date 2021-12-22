@@ -68,8 +68,8 @@ class Dialog(qw.QWidget):
         self.parent = parent
         self.book = book
         self.checked_account = ""
-        mainlayout = qw.QVBoxLayout()
-        self.setLayout(mainlayout)
+        mainlayout = qw.QVBoxLayout(self)
+        # self.setLayout(mainlayout)
         hlayout = qw.QHBoxLayout()
         mainlayout.addLayout(hlayout)
         leftv = qw.QVBoxLayout()
@@ -196,7 +196,7 @@ class MainWindow(qw.QMainWindow):
                     qw.QMessageBox.critical(self, "Book Error", msg)
             else:
                 self.setWindowTitle(f"Το {filename} δεν είναι διαθέσιμο")
-        return None
+        return ''
 
     def init_vals(self, filename, book):
         self.dlg = Dialog(filename, book, self)
@@ -212,8 +212,13 @@ class MainWindow(qw.QMainWindow):
     def open(self):
         fnam, _ = qw.QFileDialog.getOpenFileName(self, "Open", self.fnam, "")
         if fnam:
-            self.init_vals(fnam)
-            self.settings.setValue("filename", fnam)
+            book, err = dot.load_from_text(fnam)
+            if book:
+                self.init_vals(fnam, book)
+                self.settings.setValue("filename", fnam)
+            else:
+                msg = f'file {fnam} has errors:\n{err}'
+                qw.QMessageBox.critical(self, "Book Error", msg)
 
 
 def main():

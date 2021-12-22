@@ -50,6 +50,11 @@ def parse(file):
             _, valid_account = rline.split()
             valid_accounts.add(valid_account)
 
+        # Λογαριασμοί που καταργούνται
+        elif rline.startswith('-'):
+            _, account2remove = rline.split()
+            valid_accounts.remove(account2remove)
+
         # Εγγραφές ανοίγματος
         elif rline.startswith("<"):
             _, adate, accounta, value = rline.split()
