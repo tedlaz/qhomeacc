@@ -3,8 +3,9 @@ from dataclasses import dataclass
 
 # from decimal import Decimal
 import qlogistiki.transaction as trs
-from .utils import account_tree
+
 from .dec import Dec
+from .utils import account_tree
 
 OUT, HEAD, LINE = 0, 1, 2
 fpa_prefix = "ΦΠΑ"
@@ -140,9 +141,9 @@ class Book:
             "Πίστωση",
             "Υπόλοιπο",
         )
-        align = (0, 1, 1, 1, 3, 3, 3)
+        align = (0, 0, 1, 1, 3, 3, 3)
         typos = (0, 0, 0, 0, 1, 1, 1)
-        sizes = (50, 110, 80, 600, 80, 80, 95)
+        sizes = (40, 80, 70, 400, 80, 80, 80)
         vals = []
         running_sum = {"total": 0}
         for trn in sorted(self.transactions):

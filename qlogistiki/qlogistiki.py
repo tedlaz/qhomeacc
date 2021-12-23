@@ -33,12 +33,16 @@ class Dmodel(qc.QAbstractTableModel):
         return len(self.mdata.headers)
 
     def headerData(self, section, orientation, role):
+
         if role == qc.Qt.ItemDataRole.DisplayRole:
+
             if orientation == qc.Qt.Orientation.Horizontal:
                 return self.mdata.headers[section]
+
             else:
                 pass
                 # return section + 1
+
         if role == qc.Qt.ItemDataRole.TextAlignmentRole:
             return qc.Qt.AlignmentFlag.AlignCenter
 
@@ -46,20 +50,28 @@ class Dmodel(qc.QAbstractTableModel):
     #     return qc.QModelIndex()
 
     def data(self, index, role):
+
         if not index.isValid():
             return None
+
         if role == qc.Qt.ItemDataRole.DisplayRole:
+
             if self.mdata.types[index.column()] == 1:
                 return str(self.mdata.values[index.row()][index.column()])
+
             else:
                 return self.mdata.values[index.row()][index.column()]
+
         if role == qc.Qt.ItemDataRole.TextAlignmentRole:
+
             if self.mdata.aligns[index.column()] == 1:
-                return qc.Qt.AlignmentFlag.AlignLeft
+                return qc.Qt.AlignmentFlag.AlignLeft | qc.Qt.AlignmentFlag.AlignVCenter
+
             elif self.mdata.aligns[index.column()] == 2:
-                return qc.Qt.AlignmentFlag.AlignCenter
+                return qc.Qt.AlignmentFlag.AlignCenter | qc.Qt.AlignmentFlag.AlignVCenter
+
             elif self.mdata.aligns[index.column()] == 3:
-                return qc.Qt.AlignmentFlag.AlignRight
+                return qc.Qt.AlignmentFlag.AlignRight | qc.Qt.AlignmentFlag.AlignVCenter
 
 
 class Dialog(qw.QWidget):
@@ -78,38 +90,14 @@ class Dialog(qw.QWidget):
         hlayout.addLayout(leftv)
         hlayout.addWidget(rightv)
 
-        self.iso = qw.QTableView()
         font = qg.QFont()
         font.setFamily("Arial")
-        self.iso.setFont(font)
 
-        self.iso.setMaximumWidth(450)
-        self.iso.setSelectionBehavior(
-            qw.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.iso.setSelectionMode(
-            qw.QAbstractItemView.SelectionMode.SingleSelection)
-        self.iso.setModel(Dmodel(self.book.isozygio_model()))
-        self.iso.resizeColumnsToContents()
-        self.iso.resizeRowsToContents()
-        leftv.addWidget(self.iso)
+        self.set_isozygio(leftv, font)
         bvalidate = qw.QPushButton("Ελεγχος Λογαριασμών")
         leftv.addWidget(bvalidate)
-
-        self.lbl = qw.QLabel(rightv)
-        self.lbl.setAlignment(qc.Qt.AlignmentFlag.AlignCenter)
-        bold_font = qg.QFont()
-        bold_font.setFamily("Arial")
-        bold_font.setBold(True)
-        bold_font.setPointSize(16)
-        bold_font.setWeight(75)
-        self.lbl.setFont(bold_font)
-        self.lbl.setMaximumHeight(25)
-        self.tbl = qw.QTableView(rightv)
-        self.tbl.setFont(font)
-        self.tbl.setWordWrap(True)
-        self.tbl.setAlternatingRowColors(True)
-        self.tbl.setSelectionMode(
-            qw.QAbstractItemView.SelectionMode.SingleSelection)
+        self.set_label(rightv)
+        self.make_table(rightv, font)
         self.setWindowTitle("Ισοζύγιο Λογαριασμών")
         if self.parent1:
             self.parent1.setWindowTitle(f"Ισοζύγιο Λογαριασμών ({filename})")
@@ -119,6 +107,40 @@ class Dialog(qw.QWidget):
         self.iso.clicked.connect(self.refresh_model_from_iso)
         self.iso.activated.connect(self.refresh_model_from_iso)
         self.tbl.doubleClicked.connect(self.show_arthro)
+
+    def set_isozygio(self, leftv, font):
+        self.iso = qw.QTableView()
+        self.iso.setFont(font)
+        self.iso.setMaximumWidth(350)
+        self.iso.setSelectionBehavior(
+            qw.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.iso.setSelectionMode(
+            qw.QAbstractItemView.SelectionMode.SingleSelection)
+        self.iso.setModel(Dmodel(self.book.isozygio_model()))
+        self.iso.resizeColumnsToContents()
+        self.iso.resizeRowsToContents()
+        leftv.addWidget(self.iso)
+
+    def set_label(self, rightv):
+        self.lbl = qw.QLabel(rightv)
+        self.lbl.setAlignment(qc.Qt.AlignmentFlag.AlignCenter)
+        bold_font = qg.QFont()
+        bold_font.setFamily("Arial")
+        bold_font.setBold(True)
+        bold_font.setPointSize(16)
+        bold_font.setWeight(75)
+        self.lbl.setFont(bold_font)
+        self.lbl.setMaximumHeight(25)
+
+    def make_table(self, rightv, font):
+        self.tbl = qw.QTableView(rightv)
+        self.tbl.setFont(font)
+        self.tbl.setWordWrap(True)
+        self.tbl.setAlternatingRowColors(True)
+        self.tbl.setSelectionBehavior(
+            qw.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setSelectionMode(
+            qw.QAbstractItemView.SelectionMode.SingleSelection)
 
     def show_arthro(self, val):
         # fixed_font = qg.QFontDatabase.systemFont(qg.QFontDatabase.FixedFont)
@@ -147,6 +169,10 @@ class Dialog(qw.QWidget):
         if account == self.checked_account:
             return
         self.checked_account = account
+        self.set_grid_color(account)
+        self.refresh_model(account)
+
+    def set_grid_color(self, account):
         lred_color = (
             "Εξοδα",
             "Αγορές",
@@ -157,15 +183,18 @@ class Dialog(qw.QWidget):
         )
         lgreen_color = ("Πωλήσεις", "Πελάτες", "Εσοδα", "Χρεώστες")
         lblue_color = ("Ταμείο", "Μετρητά")
+
         if account.startswith(lred_color):
             self.tbl.setStyleSheet("alternate-background-color: #FFDEE3;")
+
         elif account.startswith(lgreen_color):
             self.tbl.setStyleSheet("alternate-background-color: #deffde;")
+
         elif account.startswith(lblue_color):
             self.tbl.setStyleSheet("alternate-background-color: #DEF3FF;")
+
         else:
             self.tbl.setStyleSheet("alternate-background-color: #CCCCCC;")
-        self.refresh_model(account)
 
     def refresh_model(self, lmos):
         self.model_lmos = Dmodel(self.book.kartella_model(lmos))
@@ -214,13 +243,16 @@ class MainWindow(qw.QMainWindow):
     def open(self):
         fnam, _ = qw.QFileDialog.getOpenFileName(self, "Open", self.fnam, "")
         if fnam:
-            book, err = dot.load_from_text(fnam)
-            if book:
-                self.init_vals(fnam, book)
-                self.settings.setValue("filename", fnam)
-            else:
-                msg = f'file {fnam} has errors:\n{err}'
-                qw.QMessageBox.critical(self, "Book Error", msg)
+            self.load_book(fnam)
+
+    def load_book(self, fnam):
+        book, err = dot.load_from_text(fnam)
+        if book:
+            self.init_vals(fnam, book)
+            self.settings.setValue("filename", fnam)
+        else:
+            msg = f'file {fnam} has errors:\n{err}'
+            qw.QMessageBox.critical(self, "Book Error", msg)
 
 
 def main():
