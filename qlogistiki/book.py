@@ -1,10 +1,7 @@
 from collections import namedtuple
 from dataclasses import dataclass
 
-# from decimal import Decimal
-import qlogistiki.transaction as trs
-
-from .dec import Dec
+from . import transaction as trs
 from .utils import account_tree
 
 OUT, HEAD, LINE = 0, 1, 2
