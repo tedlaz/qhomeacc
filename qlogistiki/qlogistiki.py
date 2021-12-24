@@ -260,6 +260,7 @@ def main():
     app.setOrganizationName("TedLazaros")
     app.setOrganizationDomain("Tedlaz")
     app.setApplicationName("qlogistiki")
+    app.setWindowIcon(qg.QIcon('homeacc.png'))
     dlg = MainWindow()
     dlg.show()
     app.exec()
