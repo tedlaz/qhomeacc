@@ -8,5 +8,5 @@ bfile = os.path.join(dir_path, "booktst.txt")
 
 
 def test_book_creation():
-    b01 = b01 = Book(*parse(bfile))
+    b01 = Book(*parse(bfile))
     print(b01.arthro_anoigmatos())
