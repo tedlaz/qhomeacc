@@ -14,7 +14,7 @@ def parse(file):
     """
     Parser for accounting text files
     """
-    trn = Transaction("1000-01-01", "", "", "")
+    # trn = Transaction("1000-01-01", "", "", "")
     dat = ""
     company_afm = ""
     company_name = ""

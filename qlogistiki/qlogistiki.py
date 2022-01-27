@@ -145,8 +145,19 @@ class Dialog(qw.QWidget):
     def show_arthro(self, val):
         # fixed_font = qg.QFontDatabase.systemFont(qg.QFontDatabase.FixedFont)
         num = val.sibling(val.row(), 0).data()
-        tr1 = self.book.get_transaction(num-1)
-        qw.QMessageBox.information(self, f"Αρθρο {num}", tr1.as_str())
+        tr1 = self.book.get_transaction(num)
+        msb = qw.QMessageBox()
+        font = qg.QFont()
+        font.setFamily("Courier")
+        # font.setBold(True)
+        # font.setPointSize(16)
+        # font.setWeight(75)
+        msb.setFont(font)
+        msb.setWindowTitle(f"Άρθρο: {num}")
+        msb.setText(tr1.as_str())
+        msb.show()
+        returnValue = msb.exec()
+        # qw.QMessageBox.information(self, f"Αρθρο {num}", tr1.as_str())
 
     def validate_ypoloipa(self):
         correct_no, err, cor = self.book.validate()
