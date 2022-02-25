@@ -149,9 +149,6 @@ class Dialog(qw.QWidget):
         msb = qw.QMessageBox()
         font = qg.QFont()
         font.setFamily("Courier")
-        # font.setBold(True)
-        # font.setPointSize(16)
-        # font.setWeight(75)
         msb.setFont(font)
         msb.setWindowTitle(f"Άρθρο: {num}")
         msb.setText(tr1.as_str())
@@ -211,8 +208,9 @@ class Dialog(qw.QWidget):
         self.model_lmos = Dmodel(self.book.kartella_model(lmos))
         self.tbl.setModel(self.model_lmos)
         self.tbl.verticalScrollBar().setValue(0)  # reset scrollbar position
-        for i, size in enumerate(self.model_lmos.mdata.sizes):
-            self.tbl.setColumnWidth(i, size)
+        # for i, size in enumerate(self.model_lmos.mdata.sizes):
+        #     self.tbl.setColumnWidth(i, size)
+        self.tbl.resizeColumnsToContents()
         self.tbl.resizeRowsToContents()
         self.lbl.setText(f"{lmos}")
 

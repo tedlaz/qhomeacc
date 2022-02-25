@@ -1,7 +1,8 @@
 """Module Transaction"""
 from collections import namedtuple
-from .dec import Dec
+
 from .account import Account
+from .dec import Dec
 from .transaction_line import TransactionLine
 
 DEBIT, CREDIT = 1, 2
@@ -42,7 +43,7 @@ class Transaction:
 
     def lines_full(self):
         """Transaction lines enriched with date, parastatiko, per, afm"""
-        full_lines = [
+        return [
             Trl(
                 self.date,
                 self.parastatiko,
@@ -54,7 +55,6 @@ class Transaction:
             )
             for l in self.lines
         ]
-        return full_lines
 
     @property
     def uid(self) -> str:

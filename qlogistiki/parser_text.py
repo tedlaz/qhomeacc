@@ -15,6 +15,7 @@ def parse(file):
     Parser for accounting text files
     """
     # trn = Transaction("1000-01-01", "", "", "")
+    Transaction.cid = 0  # Πολύ βασικό γιατι αλλιώς η αρίθμιση έχει θέμα
     dat = ""
     company_afm = ""
     company_name = ""
