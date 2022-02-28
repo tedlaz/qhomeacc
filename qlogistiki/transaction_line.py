@@ -1,30 +1,29 @@
 """Module for Transaction_line"""
 from .account import Account
-from .dec import Dec
 
 
 class TransactionLine:
     __slots__ = ["account", "value", "sxolio"]
 
-    def __init__(self, account, value, sxolio=""):
-        self.account = Account(account)
-        self.value = Dec(value)
+    def __init__(self, account_code: str, value: float, sxolio: str = ""):
+        self.account = Account(account_code)
+        self.value = round(value, 2)
         self.sxolio = sxolio.strip()
 
     @property
-    def debit(self) -> Dec:
+    def debit(self) -> float:
         if self.value > 0:
             return self.value
-        return Dec(0)
+        return 0.0
 
     @property
-    def credit(self) -> Dec:
+    def credit(self) -> float:
         if self.value < 0:
             return -self.value
-        return Dec(0)
+        return 0.0
 
     @property
-    def delta(self) -> Dec:
+    def delta(self) -> float:
         """For compatibility reasons only"""
         return self.value
 
