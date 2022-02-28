@@ -26,5 +26,5 @@ def save2text(book, destination_file):
 def save_dummy(abook):
     txt = f"$ {abook.afm} {abook.company_name}\n"
     for trn in sorted(abook.transactions):
-        txt += f"{trn.as_str()}\n"
+        txt += f"{trn}\n"
     return txt

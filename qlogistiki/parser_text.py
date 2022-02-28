@@ -78,8 +78,8 @@ def parse(file):
             dat = dat.strip()
             par = par.strip()
             per = per.strip()
-            afm = afma[0].strip() if afma else ""
-            trn = Transaction(dat, par, per, afm)
+            # afm = afma[0].strip() if afma else ""
+            trn = Transaction(dat, par, per)  # , afm)
             transactions.append(trn)
             tran_total = 0
 
@@ -92,14 +92,14 @@ def parse(file):
             if account not in valid_accounts:
                 raise ValueError(f"Invalid account: {account}, date: {dat}")
             # Εδώ δημιουργείται αυτόματα ο λογαριασμός ΦΠΑ
-            if account == FPA_PREFIX:
-                account = f"{FPA_PREFIX}.{trn.last_account.name}"
-                pfpa = Decimal(trn.last_account.name.split(".")[-1][3:][:-1])
-                calfpa = trn.last_delta * pfpa / Decimal(100)
-                trn.fpa_status = 1
-                # check fpa here /home/ted/smb/documents/ted-data/tedata
-                if abs(val - calfpa) > 0.01:
-                    trn.fpa_status = 2
+            # if account == FPA_PREFIX:
+            #     account = f"{FPA_PREFIX}.{trn.last_account.name}"
+            #     pfpa = Decimal(trn.last_account.name.split(".")[-1][3:][:-1])
+            #     calfpa = trn.last_delta * pfpa / Decimal(100)
+            #     trn.fpa_status = 1
+            #     # check fpa here /home/ted/smb/documents/ted-data/tedata
+            #     if abs(val - calfpa) > 0.01:
+            #         trn.fpa_status = 2
             if val:
                 trn.add_line(account, val, sxolio)
                 tran_total += val

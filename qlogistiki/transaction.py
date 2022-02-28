@@ -2,13 +2,12 @@
 from collections import namedtuple
 
 from .account import Account
-from .dec import Dec
 from .transaction_line import TransactionLine
 
 DEBIT, CREDIT = 1, 2
 decr = {1: "Χρέωση", 2: "Πίστωση"}
 
-Trl = namedtuple("Trl", "date par per acc typos val")
+Trl = namedtuple("Trl", "id date par per acc typos val")
 
 
 class Transaction:
@@ -29,17 +28,17 @@ class Transaction:
         self.date = date
         self.parastatiko = parastatiko
         self.perigrafi = perigrafi
-        self.lines = []
+        self.lines: list[TransactionLine] = []
 
     def lines_full(self):
-        """Transaction lines enriched with date, parastatiko, per, afm"""
         return [
             Trl(
+                self.id,
                 self.date,
                 self.parastatiko,
                 self.perigrafi,
                 l.account,
-                l.typos,
+                l.sxolio,
                 l.value,
             )
             for l in self.lines
@@ -132,27 +131,14 @@ class Transaction:
             ")"
         )
 
-    def as_str(self):
-        """returns a string representation of transaction"""
-        maxnam = max([len(i.account.name) for i in self.lines])
-        maxn = max([len(i.delta.gr0) for i in self.lines])
-        if self.afm:
-            stt = f'{self.date} "{self.parastatiko}" "{self.perigrafi}" {self.afm}\n'
-        else:
-            stt = f'{self.date} "{self.parastatiko}" "{self.perigrafi}"\n'
-        for i, lin in enumerate(self.lines):
-            if len(self.lines) == i + 1:
-                stt += f"  {lin.account.name}\n"
-            else:
-                if lin.sxolio:
-                    tlin = f"  {lin.account.name:<{maxnam}} {lin.delta.gr0:>{maxn}} # {lin.sxolio}"
-                else:
-                    tlin = f"  {lin.account.name:<{maxnam}} {lin.delta.gr0:>{maxn}}"
-                stt += tlin.rstrip() + "\n"
-        return stt
+    # def as_str(self):
+    #     stt = f'{self.date} "{self.parastatiko}" "{self.perigrafi}"\n'
+    #     for lin in self.lines:
+    #         stt += f'{lin}\n'
+    #     return stt
 
     def __str__(self) -> str:
-        ast = f"\n{self.date} {self.parastatiko} {self.perigrafi} {self.afm}\n"
+        ast = f"\n{self.date} {self.parastatiko} {self.perigrafi}\n"
         for lin in self.lines:
             ast += f"  {lin}\n"
         return ast

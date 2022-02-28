@@ -13,6 +13,10 @@ class Account:
         self.name = name
 
     @property
+    def name_length(self):
+        return len(self.name)
+
+    @property
     def tree(self) -> list:
         spl = self.name.split(self.splitter)
         lvls = [self.splitter.join(spl[: i + 1]) for i, _ in enumerate(spl)]

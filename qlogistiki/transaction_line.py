@@ -1,12 +1,13 @@
 """Module for Transaction_line"""
 from .account import Account
+from .utils import f2gr
 
 
 class TransactionLine:
     __slots__ = ["account", "value", "sxolio"]
 
     def __init__(self, account_code: str, value: float, sxolio: str = ""):
-        self.account = Account(account_code)
+        self.account: Account = Account(account_code)
         self.value = round(value, 2)
         self.sxolio = sxolio.strip()
 
@@ -26,6 +27,10 @@ class TransactionLine:
     def delta(self) -> float:
         """For compatibility reasons only"""
         return self.value
+
+    @property
+    def delta_str(self):
+        return f'{self.value:.2}'
 
     def __eq__(self, other) -> bool:
         return (self.value == other.value) and (self.account.name == other.account.name)
@@ -52,4 +57,4 @@ class TransactionLine:
         )
 
     def __str__(self) -> str:
-        return f"{self.account:<30} {self.debit:>14} {self.credit:>14}"
+        return f"{self.account:<30} {self.sxolio[:30]:<30} {f2gr(self.debit):>14} {f2gr(self.credit):>14}"

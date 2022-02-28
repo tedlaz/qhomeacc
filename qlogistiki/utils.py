@@ -1,4 +1,4 @@
-from decimal import Decimal, ROUND_HALF_UP, ROUND_UP
+from decimal import ROUND_HALF_UP, ROUND_UP, Decimal
 
 
 def isNum(val):  # is val number or not
@@ -138,3 +138,9 @@ def dec2gr(anum):
     if anum == 0:
         return ""
     return f"{anum:,.2f}".replace(",", "|").replace(".", ",").replace("|", ".")
+
+
+def f2gr(number):
+    if number == 0:
+        return '0,00'
+    return f"{number:,.2f}".replace(",", "|").replace(".", ",").replace("|", ".")
