@@ -7,6 +7,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 bfile = os.path.join(dir_path, "booktst.txt")
 
 
-def test_book_creation():
-    b01 = Book(*parse(bfile))
-    print(b01.arthro_anoigmatos())
+# def test_book_creation():
+#     b01 = Book(*parse(bfile))
+#     print(b01.arthro_anoigmatos())

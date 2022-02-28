@@ -6,9 +6,9 @@ from .utils import f2gr
 class TransactionLine:
     __slots__ = ["account", "value", "sxolio"]
 
-    def __init__(self, account_code: str, value: float, sxolio: str = ""):
-        self.account: Account = Account(account_code)
-        self.value = round(value, 2)
+    def __init__(self, account: Account, value: float, sxolio: str = ""):
+        self.account: Account = account
+        self.value: float = round(value, 2)
         self.sxolio = sxolio.strip()
 
     @property
@@ -26,6 +26,8 @@ class TransactionLine:
     @property
     def delta(self) -> float:
         """For compatibility reasons only"""
+        if self.account.is_reverse:
+            return -self.value
         return self.value
 
     @property
@@ -41,15 +43,15 @@ class TransactionLine:
         return self.account.name < other.account.name
 
     def __mul__(self, number):
-        return TransactionLine(self.account.name, self.value * number)
+        return TransactionLine(self.account, self.value * number)
 
     def __rmul__(self, number):
-        return TransactionLine(self.account.name, self.value * number)
+        return TransactionLine(self.account, self.value * number)
 
     def __add__(self, other):
         if self.account.name != other.account.name:
             raise ValueError("For addition accounts must me the same")
-        return TransactionLine(self.account.name, self.value + other.value)
+        return TransactionLine(self.account, self.value + other.value)
 
     def __repr__(self) -> str:
         return (

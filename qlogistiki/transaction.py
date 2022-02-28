@@ -1,5 +1,6 @@
 """Module Transaction"""
 from collections import namedtuple
+from datetime import date
 
 from .account import Account
 from .transaction_line import TransactionLine
@@ -7,7 +8,12 @@ from .transaction_line import TransactionLine
 DEBIT, CREDIT = 1, 2
 decr = {1: "Χρέωση", 2: "Πίστωση"}
 
-Trl = namedtuple("Trl", "id date par per acc typos val")
+Trl = namedtuple("Trl", "id date par per acc typos val delta debit credit")
+
+
+class Hmerologio:
+    def __init__(self):
+        self.name = ''
 
 
 class Transaction:
@@ -23,9 +29,9 @@ class Transaction:
         "lines"
     ]
 
-    def __init__(self, date: str, parastatiko: str, perigrafi: str, idv: int = 0):
+    def __init__(self, iso_date: str, parastatiko: str, perigrafi: str, idv: int = 0):
         self.id = idv
-        self.date = date
+        self.date: date = date.fromisoformat(iso_date)
         self.parastatiko = parastatiko
         self.perigrafi = perigrafi
         self.lines: list[TransactionLine] = []
@@ -40,8 +46,28 @@ class Transaction:
                 l.account,
                 l.sxolio,
                 l.value,
+                l.delta,
+                l.debit,
+                l.credit
             )
             for l in self.lines
+        ]
+
+    def lines_full_filtered(self, account_name: str):
+        return [
+            {
+                'id': self.id,
+                'date': self.date,
+                'parastatiko': self.parastatiko,
+                'perigrafi': self.perigrafi,
+                'account': l.account,
+                'sxolio': l.sxolio,
+                'value': l.value,
+                'delta': l.delta,
+                'debit': l.debit,
+                'credit': l.credit
+            }
+            for l in self.lines if l.account.name.startswith(account_name)
         ]
 
     @property
@@ -53,7 +79,7 @@ class Transaction:
         """
         Generate a unique id
         """
-        date_part = self.date.replace("-", "")
+        date_part = self.date.isoformat().replace("-", "")
         parastatiko_part = self.parastatiko.replace(" ", "")
         val_part = str(self.total).replace(',', '').replace('.', '')
         return f"{date_part}{parastatiko_part}{val_part}"
@@ -68,6 +94,10 @@ class Transaction:
 
     @property
     def total(self):
+        return sum(l.debit for l in self.lines)
+
+    @property
+    def value(self):
         return sum(l.debit for l in self.lines)
 
     def get_lines_by_account(self, account_part, running_sum, found):
@@ -94,18 +124,18 @@ class Transaction:
                     )
                 )
 
-    def add_line(self, account: str, value, sxolio=""):
+    def add_line(self, account: Account, value: float, sxolio: str = ""):
         new_line = TransactionLine(account, value, sxolio)
         self.lines.append(new_line)
 
-    def add_connected_lines(self, acc1, acc2, value, pososto):
+    def add_connected_lines(self, acc1: Account, acc2: Account, value: float, pososto: float):
         self.add_line(acc1, value)
         self.add_line(acc2, value * pososto / 100.0)
 
-    def add_last_line(self, account, sxolio=""):
+    def add_last_line(self, account: Account, sxolio: str = ""):
         if self.delta == 0:
             raise ValueError(f"Transaction {self} is already balanced")
-        new_line = TransactionLine(account, -self.delta, sxolio)
+        new_line = TransactionLine(account, -self.value, sxolio)
         self.lines.append(new_line)
 
     @property
@@ -130,12 +160,6 @@ class Transaction:
             f"lines=[{lins}]"
             ")"
         )
-
-    # def as_str(self):
-    #     stt = f'{self.date} "{self.parastatiko}" "{self.perigrafi}"\n'
-    #     for lin in self.lines:
-    #         stt += f'{lin}\n'
-    #     return stt
 
     def __str__(self) -> str:
         ast = f"\n{self.date} {self.parastatiko} {self.perigrafi}\n"

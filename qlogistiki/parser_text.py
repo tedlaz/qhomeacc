@@ -1,9 +1,9 @@
 """Module to parse text accounting books"""
 from collections import defaultdict, namedtuple
-from decimal import Decimal
 
+from .account import Account, LogistikoSxedio, account_types
 from .transaction import Transaction
-from .utils import gr2dec
+from .utils import gr2float
 
 ValPoint = namedtuple("ValPoint", "date account delta")
 Anoigma = namedtuple("Anoigma", "date account value")
@@ -15,7 +15,8 @@ def parse(file):
     Parser for accounting text files
     """
     # trn = Transaction("1000-01-01", "", "", "")
-    Transaction.cid = 0  # Πολύ βασικό γιατι αλλιώς η αρίθμιση έχει θέμα
+    # Transaction.cid = 0  # Πολύ βασικό γιατι αλλιώς η αρίθμιση έχει θέμα
+    lsx = LogistikoSxedio('gr', account_types)
     dat = ""
     company_afm = ""
     company_name = ""
@@ -23,7 +24,7 @@ def parse(file):
     validations = []
     anoigma = []
     valid_accounts = set()
-    accounts = defaultdict(Decimal)
+    accounts = defaultdict(float)
     tran_total = 0
 
     with open(file, encoding='utf8') as fil:
@@ -59,13 +60,13 @@ def parse(file):
         # Εγγραφές ανοίγματος
         elif rline.startswith("<"):
             _, adate, accounta, value = rline.split()
-            anoigma.append(Anoigma(adate, accounta, gr2dec(value)))
+            anoigma.append(Anoigma(adate, accounta, gr2float(value)))
 
         # Γραμμή επιβεβαίωσης υπολοίπου
         elif rline.startswith(("@")):
             # @ 2020-05-10 Αγορές.Εμπορευμάτων.εσωτερικού -120,32
             _, cdat, cacc, cval = rline.split()
-            validations.append(ValPoint(cdat, cacc, gr2dec(cval)))
+            validations.append(ValPoint(cdat, cacc, gr2float(cval)))
 
         # Γραμμή Head (Ημερομηνία EEEE-MM-DD γίνεται EEEEMMDD αριθμητικό)
         elif rline[:10].replace("-", "").isnumeric():
@@ -88,24 +89,15 @@ def parse(file):
             accval, *sxolio = rline.split("#")
             sxolio = sxolio[0].strip() if sxolio else ""
             account, *txtval = accval.split()
-            val = gr2dec(txtval[0]) if txtval else 0
+            val = gr2float(txtval[0]) if txtval else 0
             if account not in valid_accounts:
                 raise ValueError(f"Invalid account: {account}, date: {dat}")
-            # Εδώ δημιουργείται αυτόματα ο λογαριασμός ΦΠΑ
-            # if account == FPA_PREFIX:
-            #     account = f"{FPA_PREFIX}.{trn.last_account.name}"
-            #     pfpa = Decimal(trn.last_account.name.split(".")[-1][3:][:-1])
-            #     calfpa = trn.last_delta * pfpa / Decimal(100)
-            #     trn.fpa_status = 1
-            #     # check fpa here /home/ted/smb/documents/ted-data/tedata
-            #     if abs(val - calfpa) > 0.01:
-            #         trn.fpa_status = 2
             if val:
-                trn.add_line(account, val, sxolio)
+                trn.add_line(Account(account, lsx), val, sxolio)
                 tran_total += val
             else:
                 val = -tran_total
-                trn.add_last_line(account, sxolio)
+                trn.add_last_line(Account(account, lsx), sxolio)
             accounts[account] += val
         else:  # Υπάρχουν γραμμές που ξεκινούν με μη αποδεκτό χαρακτήρα
             pass

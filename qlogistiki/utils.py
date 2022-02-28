@@ -1,4 +1,9 @@
+from collections import namedtuple
 from decimal import ROUND_HALF_UP, ROUND_UP, Decimal
+
+
+def ntuple_from_dict(name, dict):
+    return namedtuple(name, dict.keys())
 
 
 def isNum(val):  # is val number or not
@@ -105,6 +110,10 @@ def gr2dec(greek_number: str) -> Decimal:
     Greek number to text decimal
     """
     return dec(gr2strdec(greek_number))
+
+
+def gr2float(greek_number: str) -> float:
+    return float(gr2strdec(greek_number))
 
 
 def account_tree(account, reversed=False, splitter=".") -> tuple:
