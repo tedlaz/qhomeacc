@@ -2,9 +2,9 @@
 import os
 import sys
 
-from PyQt6 import QtCore as qc
-from PyQt6 import QtGui as qg
-from PyQt6 import QtWidgets as qw
+from PySide6 import QtCore as qc
+from PySide6 import QtGui as qg
+from PySide6 import QtWidgets as qw
 
 from . import data_operations_text as dot
 
@@ -34,7 +34,7 @@ class Dmodel(qc.QAbstractTableModel):
 
     def headerData(self, section, orientation, role):
 
-        if role == qc.Qt.ItemDataRole.DisplayRole:
+        if role == qc.Qt.DisplayRole:
 
             if orientation == qc.Qt.Orientation.Horizontal:
                 return self.mdata.headers[section]
@@ -43,8 +43,8 @@ class Dmodel(qc.QAbstractTableModel):
                 pass
                 # return section + 1
 
-        if role == qc.Qt.ItemDataRole.TextAlignmentRole:
-            return qc.Qt.AlignmentFlag.AlignCenter
+        if role == qc.Qt.TextAlignmentRole:
+            return qc.Qt.AlignCenter
 
     # def index(self, row, column, parent):
     #     return qc.QModelIndex()
@@ -54,7 +54,7 @@ class Dmodel(qc.QAbstractTableModel):
         if not index.isValid():
             return None
 
-        if role == qc.Qt.ItemDataRole.DisplayRole:
+        if role == qc.Qt.DisplayRole:
 
             if self.mdata.types[index.column()] == 1:
                 return str(self.mdata.values[index.row()][index.column()])
@@ -62,16 +62,16 @@ class Dmodel(qc.QAbstractTableModel):
             else:
                 return self.mdata.values[index.row()][index.column()]
 
-        if role == qc.Qt.ItemDataRole.TextAlignmentRole:
+        if role == qc.Qt.TextAlignmentRole:
 
             if self.mdata.aligns[index.column()] == 1:
-                return qc.Qt.AlignmentFlag.AlignLeft | qc.Qt.AlignmentFlag.AlignVCenter
+                return int(qc.Qt.AlignLeft | qc.Qt.AlignVCenter)
 
-            elif self.mdata.aligns[index.column()] == 2:
-                return qc.Qt.AlignmentFlag.AlignCenter | qc.Qt.AlignmentFlag.AlignVCenter
+            if self.mdata.aligns[index.column()] == 2:
+                return int(qc.Qt.AlignCenter | qc.Qt.AlignVCenter)
 
-            elif self.mdata.aligns[index.column()] == 3:
-                return qc.Qt.AlignmentFlag.AlignRight | qc.Qt.AlignmentFlag.AlignVCenter
+            if self.mdata.aligns[index.column()] == 3:
+                return int(qc.Qt.AlignRight | qc.Qt.AlignVCenter)
 
 
 class Dialog(qw.QWidget):
@@ -123,12 +123,12 @@ class Dialog(qw.QWidget):
 
     def set_label(self, rightv):
         self.lbl = qw.QLabel(rightv)
-        self.lbl.setAlignment(qc.Qt.AlignmentFlag.AlignCenter)
+        self.lbl.setAlignment(qc.Qt.AlignCenter)
         bold_font = qg.QFont()
         bold_font.setFamily("Arial")
         bold_font.setBold(True)
         bold_font.setPointSize(16)
-        bold_font.setWeight(75)
+        bold_font.setWeight(qg.QFont.Bold)
         self.lbl.setFont(bold_font)
         self.lbl.setMaximumHeight(25)
 
@@ -137,6 +137,7 @@ class Dialog(qw.QWidget):
         self.tbl.setFont(font)
         self.tbl.setWordWrap(True)
         self.tbl.setAlternatingRowColors(True)
+        # self.tbl.horizontalHeader().setStretchLastSection(True)
         self.tbl.setSelectionBehavior(
             qw.QAbstractItemView.SelectionBehavior.SelectRows)
         self.tbl.setSelectionMode(
@@ -208,9 +209,9 @@ class Dialog(qw.QWidget):
         self.model_lmos = Dmodel(self.book.kartella_model(lmos))
         self.tbl.setModel(self.model_lmos)
         self.tbl.verticalScrollBar().setValue(0)  # reset scrollbar position
-        # for i, size in enumerate(self.model_lmos.mdata.sizes):
-        #     self.tbl.setColumnWidth(i, size)
-        self.tbl.resizeColumnsToContents()
+        for i, size in enumerate(self.model_lmos.mdata.sizes):
+            self.tbl.setColumnWidth(i, size)
+        # self.tbl.resizeColumnsToContents()
         self.tbl.resizeRowsToContents()
         self.lbl.setText(f"{lmos}")
 
@@ -225,7 +226,7 @@ class MainWindow(qw.QMainWindow):
         self.fnam = self.get_filename()
 
     def get_filename(self):
-        filename = self.settings.value("filename", defaultValue=None)
+        filename = str(self.settings.value("filename", defaultValue=''))
         if filename:
             if os.path.isfile(filename):
                 book, err = dot.load_from_text(filename)
