@@ -3,7 +3,7 @@ import qlogistiki.transaction as trn
 
 
 def test_new_from_delta():
-    cht = acc.LogistikoSxedio('gr', acc.account_types)
+    cht = acc.LogistikoSxedio('gr', acc.omades_types_gr)
     li1 = trn.TransactionLine(acc.Account("Ταμείο", cht), -100.26)
     assert li1.debit == 0
     assert li1.credit == 100.26
@@ -17,7 +17,7 @@ def test_new_from_delta():
 
 
 def test_transaction_01():
-    cht = acc.LogistikoSxedio('gr', acc.account_types)
+    cht = acc.LogistikoSxedio('gr', acc.omades_types_gr)
     tr1 = trn.Transaction("2020-01-10", "", "Σουπερμαρκετ πόπη")
     tr1.add_line(cht.account("20.00.00.024"), 100)
     tr1.add_line(cht.account("54.00.20.024"), 24)

@@ -71,7 +71,7 @@ class Transaction:
         ]
 
     @property
-    def delta(self) -> float:
+    def rest(self) -> float:
         return round(sum(l.value for l in self.lines), 2)
 
     @property
@@ -88,7 +88,7 @@ class Transaction:
     def is_balanced(self) -> bool:
         if len(self.lines) < 2:
             return False
-        if self.delta == 0:
+        if self.rest == 0:
             return True
         return False
 
@@ -133,9 +133,9 @@ class Transaction:
         self.add_line(acc2, value * pososto / 100.0)
 
     def add_last_line(self, account: Account, sxolio: str = ""):
-        if self.delta == 0:
+        if self.rest == 0:
             raise ValueError(f"Transaction {self} is already balanced")
-        new_line = TransactionLine(account, -self.value, sxolio)
+        new_line = TransactionLine(account, -self.rest, sxolio)
         self.lines.append(new_line)
 
     @property

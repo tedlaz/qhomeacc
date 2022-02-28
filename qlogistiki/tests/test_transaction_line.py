@@ -1,9 +1,9 @@
-from qlogistiki.account import Account, LogistikoSxedio, account_types
+from qlogistiki.account import Account, LogistikoSxedio, omades_types_gr
 from qlogistiki.transaction_line import TransactionLine
 
 
 def test_tr001():
-    ls1 = LogistikoSxedio('gr', account_types)
+    ls1 = LogistikoSxedio('gr', omades_types_gr)
     tl1 = TransactionLine(Account("Aa.Bb.Cc", ls1), -100)
     tl2 = TransactionLine(Account("Aa.Bb.Cc", ls1), -100)
     assert tl1 == tl2

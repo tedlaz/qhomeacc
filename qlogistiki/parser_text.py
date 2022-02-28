@@ -1,104 +1,77 @@
-"""Module to parse text accounting books"""
-from collections import defaultdict, namedtuple
+import re
 
-from .account import Account, LogistikoSxedio, account_types
+from .account import LogistikoSxedio
+from .book import Book
 from .transaction import Transaction
 from .utils import gr2float
 
-ValPoint = namedtuple("ValPoint", "date account delta")
-Anoigma = namedtuple("Anoigma", "date account value")
-FPA_PREFIX = "ΦΠΑ"
+isodate = r"^\d{4}-\d{2}-\d{2}"
+detline = r"^  ."
+
+find_date = re.compile(isodate)
+find_dlin = re.compile(detline)
+
+account_types = {
+    'Πάγια': 'pagia',
+    '2': 'apothemata',
+    'Ταμείο': 'apaitiseis',
+    'Χρεώστες': 'apaitiseis',
+    '4': 'kefalaio',
+    'Πιστωτές': 'ypoxreoseis',
+    'Αποθεματικό': 'ypoxreoseis',
+    'Προμηθευτές': 'ypoxreoseis',
+    'Εξοδα': 'ejoda',
+    'Εσοδα': 'esoda',
+    '8': 'anorgana',
+    '54.00': 'fpa'
+}
 
 
-def parse(file):
-    """
-    Parser for accounting text files
-    """
-    # trn = Transaction("1000-01-01", "", "", "")
-    # Transaction.cid = 0  # Πολύ βασικό γιατι αλλιώς η αρίθμιση έχει θέμα
-    lsx = LogistikoSxedio('gr', account_types)
-    dat = ""
-    company_afm = ""
-    company_name = ""
-    transactions = []
-    validations = []
-    anoigma = []
-    valid_accounts = set()
-    accounts = defaultdict(float)
-    tran_total = 0
+def parse(filepath):
+    lsx = LogistikoSxedio('home', account_types)
+    book = Book('test', lsx)
+    trn_id = 0
+    with open(filepath, encoding='utf8') as fil:
 
-    with open(file, encoding='utf8') as fil:
-        lines = fil.read().split("\n")
+        for row_line in fil.readlines():
 
-    for line in lines:
-        rline = line.rstrip()
+            line = row_line.strip()
 
-        # Αγνόησε τις κενές γραμμές
-        if len(rline) == 0:
-            continue
+            if len(line) < 4:
+                continue
 
-        # Αγνόησε τις γραμμές σχολίων
-        elif rline.startswith("#"):
-            continue
+            if line.startswith('#'):
+                continue
 
-        # Στοιχεία εταιρείας (ΑΦΜ, Επωνυμία)
-        elif rline.startswith("$"):
-            _, co_afm, *co_name = rline.split()
-            company_afm = co_afm
-            company_name = " ".join(co_name)
+            if line.startswith('+'):
+                _, acc, *_ = line.split()
+                lsx.account(acc)
 
-        # Λογαριασμοί ισχύοντες
-        elif rline.startswith('+'):
-            _, valid_account = rline.split()
-            valid_accounts.add(valid_account)
+            if find_date.findall(line):
+                dat, par, _, per, *_ = line.split('"')
+                dat = dat.strip()
+                par = par.strip()
+                per = per.strip()
+                trn_id += 1
+                book.add_transaction(
+                    trn_id, Transaction(dat, par, per, trn_id))
+                continue
 
-        # Λογαριασμοί που καταργούνται
-        elif rline.startswith('-'):
-            _, account2remove = rline.split()
-            valid_accounts.remove(account2remove)
+            if find_dlin.findall(row_line):
 
-        # Εγγραφές ανοίγματος
-        elif rline.startswith("<"):
-            _, adate, accounta, value = rline.split()
-            anoigma.append(Anoigma(adate, accounta, gr2float(value)))
+                accval, *sxolio = line.split("#")
+                sxolio = sxolio[0].strip() if sxolio else ""
+                account, *txtval = accval.split()
 
-        # Γραμμή επιβεβαίωσης υπολοίπου
-        elif rline.startswith(("@")):
-            # @ 2020-05-10 Αγορές.Εμπορευμάτων.εσωτερικού -120,32
-            _, cdat, cacc, cval = rline.split()
-            validations.append(ValPoint(cdat, cacc, gr2float(cval)))
+                if not lsx.is_valid_account(account):
+                    raise ValueError(f'Account Error')
 
-        # Γραμμή Head (Ημερομηνία EEEE-MM-DD γίνεται EEEEMMDD αριθμητικό)
-        elif rline[:10].replace("-", "").isnumeric():
-            # if status == LINE:
-            #     self.add_transaction(trn)
-            try:
-                dat, par, _, per, *afma = rline.split('"')
-            except:
-                raise ValueError(f"Error parsing line: {rline}")
-            dat = dat.strip()
-            par = par.strip()
-            per = per.strip()
-            # afm = afma[0].strip() if afma else ""
-            trn = Transaction(dat, par, per)  # , afm)
-            transactions.append(trn)
-            tran_total = 0
+                val = gr2float(txtval[0]) if txtval else 0
+                trn = book.get_transaction(trn_id)
 
-        # Γραμμή λεπτομέρειας
-        elif rline[:2] == "  ":  # Line detail
-            accval, *sxolio = rline.split("#")
-            sxolio = sxolio[0].strip() if sxolio else ""
-            account, *txtval = accval.split()
-            val = gr2float(txtval[0]) if txtval else 0
-            if account not in valid_accounts:
-                raise ValueError(f"Invalid account: {account}, date: {dat}")
-            if val:
-                trn.add_line(Account(account, lsx), val, sxolio)
-                tran_total += val
-            else:
-                val = -tran_total
-                trn.add_last_line(Account(account, lsx), sxolio)
-            accounts[account] += val
-        else:  # Υπάρχουν γραμμές που ξεκινούν με μη αποδεκτό χαρακτήρα
-            pass
-    return company_afm, company_name, transactions, validations, accounts, anoigma
+                if val:
+                    trn.add_line(lsx.account(account), val, sxolio)
+                else:
+                    trn.add_last_line(lsx.account(account), sxolio)
+
+    return book

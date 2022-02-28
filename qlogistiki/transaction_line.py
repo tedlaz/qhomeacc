@@ -25,7 +25,6 @@ class TransactionLine:
 
     @property
     def delta(self) -> float:
-        """For compatibility reasons only"""
         if self.account.is_reverse:
             return -self.value
         return self.value
