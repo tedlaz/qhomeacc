@@ -174,3 +174,8 @@ class Transaction:
         if self.date == oth.date:
             return self.id < oth.id
         return self.date < oth.date
+
+    def __gt__(self, oth):
+        if self.date == oth.date:
+            return self.id > oth.id
+        return self.date > oth.date

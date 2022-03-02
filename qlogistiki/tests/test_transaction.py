@@ -28,3 +28,18 @@ def test_transaction_01():
     assert tr1.value == 124
     # tr1.afm = "123123123"
     # assert tr1.uid == "2020011012312312312400"
+
+
+def test_transaction_comparison():
+    cht = acc.LogistikoSxedio('gr', acc.omades_types_gr)
+    tr1 = trn.Transaction("2020-01-15", "", "Σουπερμαρκετ πόπη", 1)
+    tr1.add_line(cht.account("20.00.00.024"), 100)
+    tr1.add_line(cht.account("54.00.20.024"), 24)
+    tr1.add_last_line(cht.account("50.00.00.001"))
+
+    tr2 = trn.Transaction("2020-01-12", "", "Σουπερμαρκετ πόπη", 2)
+    tr2.add_line(cht.account("20.00.00.024"), 100)
+    tr2.add_line(cht.account("54.00.20.024"), 24)
+    tr2.add_last_line(cht.account("50.00.00.001"))
+
+    assert tr1 > tr2

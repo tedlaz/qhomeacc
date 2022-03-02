@@ -1,7 +1,6 @@
 # Personal home accounting
 
-For development you may need to:
-
-```
-pip install pytest pyinstaller
-```
+book must have a first line like:
+j-open
+j-normal
+j-close

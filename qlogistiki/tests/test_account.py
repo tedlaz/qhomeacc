@@ -16,7 +16,8 @@ account_types = {
 
 def test_ls1():
     ls1 = LogistikoSxedio('gr', account_types)
-    print(ls1.account_type(Account('54.00.00.013', ls1)))
+    assert ls1.account_type(Account('54.00.00.013', ls1)) == [
+        'ypoxreoseis', 'fpa']
 
 
 def test_acc_tree():
