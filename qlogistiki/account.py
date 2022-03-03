@@ -43,6 +43,9 @@ class LogistikoSxedio:
             self.accounts[account_name] = Account(account_name, self)
         return self.accounts[account_name]
 
+    def get_account(self, account_name: str):
+        return self.accounts.get(account_name, None)
+
     def is_valid_account(self, account_name: str) -> bool:
         return account_name in self.accounts.keys()
 

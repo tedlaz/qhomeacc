@@ -36,7 +36,12 @@ class Transaction:
         self.perigrafi = perigrafi
         self.lines: list[TransactionLine] = []
 
-    def lines_full(self):
+    def set_id(self, idv: int):
+        if self.id != 0:
+            raise ValueError(f"Transaction {self} already has id={self.id}")
+        self.id = idv
+
+    def lines_full(self) -> list[Trl]:
         return [
             Trl(
                 self.id,
@@ -53,7 +58,7 @@ class Transaction:
             for l in self.lines
         ]
 
-    def lines_full_filtered(self, account_name: str):
+    def lines_by_account_name(self, account_name: str) -> list[dict]:
         return [
             {
                 'id': self.id,

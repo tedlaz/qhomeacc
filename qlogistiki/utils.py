@@ -151,5 +151,5 @@ def dec2gr(anum):
 
 def f2gr(number):
     if number == 0:
-        return '0,00'
+        return ''
     return f"{number:,.2f}".replace(",", "|").replace(".", ",").replace("|", ".")

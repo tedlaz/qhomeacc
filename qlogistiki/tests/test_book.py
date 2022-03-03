@@ -8,5 +8,5 @@ bfile = os.path.join(dir_path, "book01")
 
 
 def test_book_creation():
-    b01 = parse('Test Book', bfile)
-    print(b01.isozygio())
+    b01 = parse(bfile)
+    print(b01.get_transaction(2).lines_by_account_name('Χρεώστες'))
