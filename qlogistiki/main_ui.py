@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QHBoxLayout,
-    QHeaderView, QLabel, QMainWindow, QPushButton,
-    QSizePolicy, QSplitter, QTableView, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QDateEdit,
+    QFrame, QHBoxLayout, QHeaderView, QLabel,
+    QMainWindow, QPushButton, QSizePolicy, QSplitter,
+    QTableView, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -28,7 +28,9 @@ class Ui_MainWindow(object):
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout_4 = QVBoxLayout(self.centralwidget)
+        self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.fr1_top = QFrame(self.centralwidget)
         self.fr1_top.setObjectName(u"fr1_top")
         self.fr1_top.setMaximumSize(QSize(16777215, 30))
@@ -38,17 +40,16 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.btn_open = QPushButton(self.fr1_top)
-        self.btn_open.setObjectName(u"btn_open")
-        self.btn_open.setMaximumSize(QSize(200, 16777215))
-
-        self.horizontalLayout.addWidget(self.btn_open)
-
 
         self.verticalLayout_4.addWidget(self.fr1_top, 0, Qt.AlignLeft)
 
         self.fr2_main = QFrame(self.centralwidget)
         self.fr2_main.setObjectName(u"fr2_main")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.fr2_main.sizePolicy().hasHeightForWidth())
+        self.fr2_main.setSizePolicy(sizePolicy)
         self.fr2_main.setFrameShape(QFrame.StyledPanel)
         self.fr2_main.setFrameShadow(QFrame.Raised)
         self.verticalLayout_3 = QVBoxLayout(self.fr2_main)
@@ -57,22 +58,22 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.splitter = QSplitter(self.fr2_main)
         self.splitter.setObjectName(u"splitter")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.splitter.sizePolicy().hasHeightForWidth())
-        self.splitter.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.splitter.sizePolicy().hasHeightForWidth())
+        self.splitter.setSizePolicy(sizePolicy1)
         self.splitter.setOrientation(Qt.Horizontal)
         self.splitter.setOpaqueResize(True)
         self.splitter.setHandleWidth(4)
         self.splitter.setChildrenCollapsible(False)
         self.fr_left = QFrame(self.splitter)
         self.fr_left.setObjectName(u"fr_left")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.fr_left.sizePolicy().hasHeightForWidth())
-        self.fr_left.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.fr_left.sizePolicy().hasHeightForWidth())
+        self.fr_left.setSizePolicy(sizePolicy2)
         self.fr_left.setMaximumSize(QSize(16777215, 16777215))
         self.fr_left.setFrameShape(QFrame.StyledPanel)
         self.fr_left.setFrameShadow(QFrame.Raised)
@@ -138,13 +139,33 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setSpacing(0)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.btn_open = QPushButton(self.fr3_bottom)
+        self.btn_open.setObjectName(u"btn_open")
+
+        self.horizontalLayout_2.addWidget(self.btn_open, 0, Qt.AlignLeft|Qt.AlignBottom)
+
+        self.date_filter = QDateEdit(self.fr3_bottom)
+        self.date_filter.setObjectName(u"date_filter")
+        self.date_filter.setEnabled(False)
+        self.date_filter.setMaximumSize(QSize(100, 16777215))
+        self.date_filter.setCalendarPopup(True)
+
+        self.horizontalLayout_2.addWidget(self.date_filter)
+
+        self.chk_filter_enable = QCheckBox(self.fr3_bottom)
+        self.chk_filter_enable.setObjectName(u"chk_filter_enable")
+        self.chk_filter_enable.setMaximumSize(QSize(20, 16777215))
+        self.chk_filter_enable.setLayoutDirection(Qt.RightToLeft)
+
+        self.horizontalLayout_2.addWidget(self.chk_filter_enable)
+
         self.btn_check_rest = QPushButton(self.fr3_bottom)
         self.btn_check_rest.setObjectName(u"btn_check_rest")
 
-        self.horizontalLayout_2.addWidget(self.btn_check_rest)
+        self.horizontalLayout_2.addWidget(self.btn_check_rest, 0, Qt.AlignRight)
 
 
-        self.verticalLayout_4.addWidget(self.fr3_bottom, 0, Qt.AlignLeft)
+        self.verticalLayout_4.addWidget(self.fr3_bottom, 0, Qt.AlignBottom)
 
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -155,8 +176,9 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.btn_open.setText(QCoreApplication.translate("MainWindow", u"Open", None))
         self.lbl_account.setText(QCoreApplication.translate("MainWindow", u":)", None))
+        self.btn_open.setText(QCoreApplication.translate("MainWindow", u"open", None))
+        self.chk_filter_enable.setText("")
         self.btn_check_rest.setText(QCoreApplication.translate("MainWindow", u"\u0388\u03bb\u03b5\u03b3\u03c7\u03bf\u03c2 \u03c5\u03c0\u03bf\u03bb\u03bf\u03af\u03c0\u03c9\u03bd", None))
     # retranslateUi
 

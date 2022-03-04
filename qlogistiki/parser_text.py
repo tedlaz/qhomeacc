@@ -60,6 +60,11 @@ def parse_imerologio(lsx, book, errors, filepath):
             if line.startswith('#'):
                 continue
 
+            if line.startswith(("@")):
+                # @ 2020-05-10 Αγορές.Εμπορευμάτων.εσωτερικού -120,32
+                _, cdat, cacc, cval = line.split()
+                book.add_validation((cdat, cacc, gr2float(cval)))
+
             if find_date.findall(line):
 
                 dat, par, _, per, *_ = line.split('"')

@@ -13,6 +13,7 @@ class Book:
         self.name: str = name
         self.chart: LogistikoSxedio = lsx
         self.transactions: dict[int, Transaction] = {}  # {id: Transaction}
+        self.validations = []
         self._last_id = 0
 
     def transactions_filter(self, apo=None, eos=None):
@@ -25,6 +26,14 @@ class Book:
                 continue
 
             yield transaction
+
+    def ypoloipo(self, account_name: str, eos=None) -> float:
+        transactions = self.transactions_filter(eos=eos)
+        ypoloipo = 0
+        for trn in sorted(transactions):
+            for line in trn.lines_by_account_name(account_name):
+                ypoloipo += line['value']
+        return round(ypoloipo, 2)
 
     def kartella(self, account_name: str, apo=None, eos=None) -> list:
         tvalue = tdebit = tcredit = tdelta = 0
@@ -128,15 +137,16 @@ class Book:
         return fis
 
     def model_isozygio(self, apo=None, eos=None) -> tuple:
-        headers = ['Λογαριασμός', 'Χρέωση', 'Πίστωση', 'Υπόλοιπο']
-        aligns = [1, 3, 3, 3]
+        # 'Χρέωση', 'Πίστωση', 'Υπόλοιπο']
+        headers = ['Λογαριασμός', 'Υπόλοιπο']
+        aligns = [1, 3]  # , 3, 3]
         data = []
         for key, v in sorted(self.isozygio_tree(apo, eos).items()):
             data.append(
                 [
                     key,
-                    f2gr(v['tdebit']),
-                    f2gr(v['tcredit']),
+                    # f2gr(v['tdebit']),
+                    # f2gr(v['tcredit']),
                     f2gr(v['tvalue'])
                 ]
             )
@@ -157,3 +167,6 @@ class Book:
 
     def get_transaction(self, idv) -> Optional[Transaction]:
         return self.transactions.get(idv, None)
+
+    def add_validation(self, validation):
+        self.validations.append(validation)

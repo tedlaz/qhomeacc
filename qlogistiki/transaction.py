@@ -4,6 +4,7 @@ from datetime import date
 
 from .account import Account
 from .transaction_line import TransactionLine
+from .utils import f2gr
 
 DEBIT, CREDIT = 1, 2
 decr = {1: "Χρέωση", 2: "Πίστωση"}
@@ -184,3 +185,18 @@ class Transaction:
         if self.date == oth.date:
             return self.id > oth.id
         return self.date > oth.date
+
+    def html(self):
+        fst = (
+            '<style>td, th {border: 1px solid #dddddd;text-align: right;padding: 5px;}</style>'
+            f"<h4>{self.date} {self.parastatiko} {self.perigrafi}</h4>"
+            '<table><tr><th>Λογ/μός</th><th>Περιγραφή</th><th>Χρέωση</th><th>Πίστωση</th></tr>'
+        )
+        for lin in self.lines:
+            fst += f"<tr><td>{lin.account.name}</td><td>{lin.sxolio}</td><td>{f2gr(lin.debit)}</td><td>{f2gr(lin.credit)}</td></tr>"
+        if len(self.lines) > 2:
+            tdebit = f2gr(sum([i.debit for i in self.lines]))
+            tcredit = f2gr(sum([i.credit for i in self.lines]))
+            fst += f'<tr><th colspan="2">Σύνολα</th><th>{tdebit}</th><th>{tcredit}</th></tr>'
+        fst += '</table>'
+        return fst

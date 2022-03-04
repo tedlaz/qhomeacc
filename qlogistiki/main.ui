@@ -15,6 +15,21 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item alignment="Qt::AlignLeft">
      <widget class="QFrame" name="fr1_top">
       <property name="maximumSize">
@@ -45,24 +60,17 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="QPushButton" name="btn_open">
-         <property name="maximumSize">
-          <size>
-           <width>200</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Open</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </item>
     <item>
      <widget class="QFrame" name="fr2_main">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -238,7 +246,7 @@
       </layout>
      </widget>
     </item>
-    <item alignment="Qt::AlignLeft">
+    <item alignment="Qt::AlignBottom">
      <widget class="QFrame" name="fr3_bottom">
       <property name="maximumSize">
        <size>
@@ -268,7 +276,46 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <item alignment="Qt::AlignLeft|Qt::AlignBottom">
+        <widget class="QPushButton" name="btn_open">
+         <property name="text">
+          <string>open</string>
+         </property>
+        </widget>
+       </item>
        <item>
+        <widget class="QDateEdit" name="date_filter">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="calendarPopup">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chk_filter_enable">
+         <property name="maximumSize">
+          <size>
+           <width>20</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignRight">
         <widget class="QPushButton" name="btn_check_rest">
          <property name="text">
           <string>Έλεγχος υπολοίπων</string>
