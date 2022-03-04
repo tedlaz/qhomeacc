@@ -2,8 +2,9 @@ import os
 import sys
 from datetime import date
 
-from PySide6 import QtCore, QtGui, QtPrintSupport, QtWidgets
+from PySide6 import QtCharts, QtCore, QtGui, QtPrintSupport, QtWidgets
 
+from . import main_rc
 from .main_ui import Ui_MainWindow
 from .model import Model
 from .parser_text import parse
@@ -72,6 +73,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         selection = self.tbl_isozygio.selectionModel()
         selection.selectionChanged.connect(self.refresh_kartella_model)
         self.tbl_kartella.setModel(None)
+        self.gr_view.setVisible(False)
         self.lbl_account.setText('')
         self.checked_account = ''
 
@@ -94,13 +96,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self, "Open", self.book_path, opt)
         if not book_path:
             return
-        self.settings.setValue("filename", book_path)
         self.open_book(book_path)
 
     def open_book(self, book_path):
         if not os.path.exists(book_path):
+            QtWidgets.QMessageBox.critical(
+                self,
+                'Υπάρχουν λάθη',
+                f'Η διαδρομή \n{book_path}\n δεν είναι προσβάσιμη.'
+            )
             return
-        self.book = parse(book_path)
+        book, errors = parse(book_path)
+        if errors:
+            QtWidgets.QMessageBox.critical(
+                self, 'Υπάρχουν λάθη', '\n'.join(errors))
+            return
+        self.settings.setValue("filename", book_path)
+        self.book = book
+        self.setWindowTitle(f"{self.book.name} - {book_path}")
         self.tbl_isozygio.setModel(Model(self.book.model_isozygio()))
         self.tbl_isozygio.resizeColumnsToContents()
         self.tbl_isozygio.resizeRowsToContents()
@@ -136,12 +149,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.tbl_kartella.setStyleSheet(
                 "alternate-background-color: #CCCCCC;")
 
+    def plot(self, account):
+        series = QtCharts.QLineSeries()
+        data = self.book.time_series(account)
+        if account.startswith(('Ταμείο', 'Χρεώστες', 'Προμηθευτές', 'Πάγια', 'Αποθεματικό')):
+            for el in data:
+                timestamp = float(el[0].isoformat().replace('-', ''))
+                # timestamp = time.mktime(el[0].timetuple())
+                series.append(timestamp, el[1])
+        else:
+            for el in data:
+                timestamp = float(el[0].isoformat().replace('-', ''))
+                series.append(timestamp, el[2])
+
+        chart = QtCharts.QChart()
+        chart.legend().hide()
+        chart.addSeries(series)
+        chart.createDefaultAxes()
+        chart.setTitle(account)
+        self.gr_view.setChart(chart)
+        self.gr_view.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.gr_view.setVisible(True)
+        # print(self.book.time_series(account))
+
     def refresh_kartella_model(self, selected, deselected):
         row = selected.first().topLeft()
         account = row.sibling(row.row(), 0).data()
 
         if account == self.checked_account:
             return
+
+        self.plot(account)
 
         self.checked_account = account
         self.set_grid_color(account)
@@ -159,19 +197,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.tbl_kartella.resizeColumnsToContents()
         for i in range(8):
-            if self.tbl_kartella.columnWidth(i) > 300:
-                self.tbl_kartella.setColumnWidth(i, 300)
+            if self.tbl_kartella.columnWidth(i) > 700:
+                self.tbl_kartella.setColumnWidth(i, 700)
         self.tbl_kartella.resizeRowsToContents()
 
 
-if __name__ == '__main__':
+def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
     app = QtWidgets.QApplication(sys.argv)
     app.setOrganizationName("TedLazaros")
     app.setOrganizationDomain("Tedlaz")
     app.setApplicationName("qhomeacc")
-    # app.setWindowIcon(qg.QIcon('homeacc.png'))
+    app.setWindowIcon(QtGui.QIcon(':img/images/homeacc.svg'))
     window = MainWindow()
     window.show()
     app.exec()

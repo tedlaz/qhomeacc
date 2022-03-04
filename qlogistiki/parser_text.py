@@ -84,7 +84,7 @@ def parse_imerologio(lsx, book, errors, filepath):
 
                 if not lsx.is_valid_account(account):
                     errors.append(
-                        f"Line {i+2}, account '{account}' is not registered")
+                        f"{filepath}:{i+2}, ο λογαριασμός '{account}' δεν είναι καταχωρημένος")
 
                 val = gr2float(txtval[0]) if txtval else 0
                 trn = book.get_transaction(trn_id)
@@ -96,12 +96,13 @@ def parse_imerologio(lsx, book, errors, filepath):
 
 
 def parse(book_dir):
-
+    errors = []
     filenames = os.listdir(book_dir)
 
     if not '000' in filenames:
-        raise ValueError(
-            f"directory {book_dir} is not a valid accounting book")
+        errors.append(
+            f"Ο Φάκελος {book_dir} δεν περιέχει βιβλίο εγγραφών λογιστικής")
+        return None, errors
 
     filenames.remove('000')
 
@@ -114,7 +115,6 @@ def parse(book_dir):
 
     book = Book(bname, lsx)
 
-    errors = []
     # print('')
     filenames.sort()
 
@@ -122,6 +122,6 @@ def parse(book_dir):
         filepath = os.path.join(book_dir, filename)
         parse_imerologio(lsx, book, errors, filepath)
 
-    print('n\nErrors:\n', '\n'.join(errors), '\n')
+    # print('n\nErrors:\n', '\n'.join(errors), '\n')
 
-    return book
+    return book, errors

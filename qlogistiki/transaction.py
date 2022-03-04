@@ -188,15 +188,15 @@ class Transaction:
 
     def html(self):
         fst = (
-            '<style>td, th {border: 1px solid #dddddd;text-align: right;padding: 5px;}</style>'
-            f"<h4>{self.date} {self.parastatiko} {self.perigrafi}</h4>"
-            '<table><tr><th>Λογ/μός</th><th>Περιγραφή</th><th>Χρέωση</th><th>Πίστωση</th></tr>'
+            '<style>table, td, th {border: 1px solid black;text-align: right;padding: 5px; border-collapse: collapse;}</style>'
+            f'<table><tr><th colspan="4"><center>{self.date} {self.parastatiko} {self.perigrafi}</center></th></tr>'
+            '<tr><th><center>Λογ/μός</center></th><th><center>Περιγραφή</center></th><th><center>Χρέωση</center></th><th><center>Πίστωση</center></th></tr>'
         )
         for lin in self.lines:
-            fst += f"<tr><td>{lin.account.name}</td><td>{lin.sxolio}</td><td>{f2gr(lin.debit)}</td><td>{f2gr(lin.credit)}</td></tr>"
+            fst += f'<tr><td align="left">{lin.account.name}</td><td align="left">{lin.sxolio}</td><td>{f2gr(lin.debit)}</td><td>{f2gr(lin.credit)}</td></tr>'
         if len(self.lines) > 2:
             tdebit = f2gr(sum([i.debit for i in self.lines]))
             tcredit = f2gr(sum([i.credit for i in self.lines]))
-            fst += f'<tr><th colspan="2">Σύνολα</th><th>{tdebit}</th><th>{tcredit}</th></tr>'
+            fst += f'<tr><th colspan="2"><center>Σύνολα</center></th><th>{tdebit}</th><th>{tcredit}</th></tr>'
         fst += '</table>'
         return fst

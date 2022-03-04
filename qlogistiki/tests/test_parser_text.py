@@ -7,7 +7,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 def test_parse():
     book_dir = os.path.join(dir_path, "book01")
-    mybook = parse(book_dir)
+    mybook, errors = parse(book_dir)
     # print(mybook.transactions)
     # print(mybook.kartella('Εσοδα'))
     # print(mybook.chart)

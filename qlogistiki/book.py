@@ -35,6 +35,16 @@ class Book:
                 ypoloipo += line['value']
         return round(ypoloipo, 2)
 
+    def time_series(self, account_name, eos=None):
+        total = 0
+        lines = []
+        transactions = self.transactions_filter(eos=eos)
+        for trn in sorted(transactions):
+            for line in trn.lines_by_account_name(account_name):
+                total += line['delta']
+                lines.append((line['date'], total, line['delta']))
+        return lines
+
     def kartella(self, account_name: str, apo=None, eos=None) -> list:
         tvalue = tdebit = tcredit = tdelta = 0
         lines = []
