@@ -1,4 +1,5 @@
 from collections import namedtuple
+from datetime import timedelta
 from decimal import ROUND_HALF_UP, ROUND_UP, Decimal
 
 
@@ -153,3 +154,12 @@ def f2gr(number):
     if number == 0:
         return ''
     return f"{number:,.2f}".replace(",", "|").replace(".", ",").replace("|", ".")
+
+
+def days_list(dapo, deos):
+    dlist = []
+    delta = deos - dapo
+    for i in range(delta.days + 1):
+        day = dapo + timedelta(days=i)
+        dlist.append(day)
+    return dlist

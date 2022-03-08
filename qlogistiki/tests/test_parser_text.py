@@ -11,6 +11,6 @@ def test_parse():
     # print(mybook.transactions)
     # print(mybook.kartella('Εσοδα'))
     # print(mybook.chart)
-    # print(mybook.transactions[1])
+    print(mybook.transactions[13])
     assert mybook.is_balanced
     # print(mybook.isozygio())

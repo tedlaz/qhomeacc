@@ -65,19 +65,12 @@ def parse_imerologio(lsx, book, errors, filepath):
 
             if find_date.findall(line):
 
-                dat, *per = line.split()
-                fper = ' '.join(per)
-                group_par = find_in_curly.findall(fper)
-                par = ''
-                if group_par:
-
-                    par = group_par[0]
-                    fper = fper.replace('{' + par + '}', '')
+                dat, par, _, per, *_ = line.split('"')
                 dat = dat.strip()
                 par = par.strip()
-                fper = fper.strip()
+                per = per.strip()
 
-                trn_id = book.add_transaction(Transaction(dat, par, fper))
+                trn_id = book.add_transaction(Transaction(dat, par, per))
 
                 continue
 

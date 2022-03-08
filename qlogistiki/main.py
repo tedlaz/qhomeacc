@@ -36,27 +36,30 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if not self.book:
             return
 
-        val_errors = []
+        val_array = []
         checks = len(self.book.validations)
         for val in self.book.validations:
             dat, acc, poso = val
             book_ypoloipo = self.book.ypoloipo(acc, dat)
             if book_ypoloipo != poso:
-                val_errors.append(
-                    (dat, acc, book_ypoloipo, poso, round(book_ypoloipo-poso, 2)))
-        if val_errors:
-            fst = (
-                '<style>td, th {border: 1px solid #dddddd;text-align: right;padding: 5px;}</style>'
-                '<table><tr><th>Ημ/νία</th><th>Λογ/μός</th><th>Ποσό</th><th>Έλεγχος</th><th>Διαφ.</th></tr>'
-            )
-            for lin in val_errors:
-                fst += f"<tr><td>{lin[0]}</td><td>{lin[1]}</td><td>{f2gr(lin[2])}</td><td>{f2gr(lin[3])}</td><td>{f2gr(lin[4])}</td></tr>"
-            fst += "</table>"
-            QtWidgets.QMessageBox.critical(
-                self, 'Βρέθηκαν λάθη', fst)
-            return
+                val_array.append(
+                    (dat, acc, book_ypoloipo, poso, round(book_ypoloipo-poso, 2), "🛑"))
+            else:
+                val_array.append(
+                    (dat, acc, book_ypoloipo, poso, round(book_ypoloipo-poso, 2), "👍"))
+
+        fst = (
+            '<style>table, td, th {border: 1px solid black;text-align: right;padding: 5px; border-collapse: collapse;}</style>'
+            '<table><tr><th>Ημ/νία</th><th>Λογ/μός</th><th>Ποσό</th><th>Έλεγχος</th><th>Διαφ.</th><th></th></tr>'
+        )
+        for lin in val_array:
+            fst += f"<tr><td>{lin[0]}</td><td>{lin[1]}</td><td>{f2gr(lin[2])}</td><td>{f2gr(lin[3])}</td><td>{f2gr(lin[4])}</td><td>{lin[5]}</td></tr>"
+        fst += "</table>"
         QtWidgets.QMessageBox.information(
-            self, f'Έλεγχος υπολοίπων', f'Έγιναν {checks} έλεγχοι υπολοίπων\nΌλα καλά 👍')
+            self, 'Ελεγχος υπολοίπων', fst)
+        # return
+        # QtWidgets.QMessageBox.information(
+        #     self, f'Έλεγχος υπολοίπων', f'Έγιναν {checks} έλεγχοι υπολοίπων\nΌλα καλά 👍')
 
     def apply_date_filter(self):
         if self.chk_filter_enable.isChecked():
@@ -152,7 +155,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def plot(self, account):
         series = QtCharts.QLineSeries()
         data = self.book.time_series(account)
-        if account.startswith(('Ταμείο', 'Χρεώστες', 'Προμηθευτές', 'Πάγια', 'Αποθεματικό')):
+        if account.startswith(('Ταμείο', 'Χρεώστες', 'Προμηθευτές', 'Πάγια', 'Αποθεματικό', 'Πιστωτές')):
             for el in data:
                 timestamp = float(el[0].isoformat().replace('-', ''))
                 # timestamp = time.mktime(el[0].timetuple())

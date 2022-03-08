@@ -4,7 +4,7 @@ from unicodedata import name
 
 from .account import LogistikoSxedio
 from .transaction import Transaction
-from .utils import f2gr
+from .utils import days_list, f2gr
 
 
 class Book:
@@ -37,13 +37,33 @@ class Book:
 
     def time_series(self, account_name, eos=None):
         total = 0
-        lines = []
+        # lines = []
+        ldir = {}
+        sdir = {}
         transactions = self.transactions_filter(eos=eos)
-        for trn in sorted(transactions):
+        strans = sorted(transactions)
+
+        final = []
+
+        min_date = date(2099, 12, 31)
+        max_date = date(1900, 1, 1)
+        for trn in strans:
             for line in trn.lines_by_account_name(account_name):
-                total += line['delta']
-                lines.append((line['date'], total, line['delta']))
-        return lines
+                if line['date'] < min_date:
+                    min_date = line['date']
+                if line['date'] > max_date:
+                    max_date = line['date']
+                ldir[line['date']] = ldir.get(line['date'], 0) + line['delta']
+                sdir[line['date']] = round(
+                    sdir.get(line['date'], 0) + line['delta'], 2)
+
+        dlist = days_list(min_date, max_date)
+
+        for day in dlist:
+            total += round(ldir.get(day, 0), 2)
+            final.append((day, total, sdir.get(day, 0)))
+
+        return final
 
     def kartella(self, account_name: str, apo=None, eos=None) -> list:
         tvalue = tdebit = tcredit = tdelta = 0
@@ -81,8 +101,9 @@ class Book:
             'Περιγραφή',
             'Σχόλιο',
             'Παρ/κό',
+            'd'
         ]
-        aligns = [3, 1, 3, 3, 3, 1, 1, 1]
+        aligns = [3, 1, 3, 3, 3, 1, 1, 1, 3]
         data = []
         for lin in lines:
             data.append(
@@ -95,6 +116,7 @@ class Book:
                     lin['perigrafi'],
                     lin['sxolio'],
                     lin['parastatiko'],
+                    lin['delta']
                 ]
             )
         data.reverse()

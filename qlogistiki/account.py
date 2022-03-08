@@ -81,7 +81,7 @@ class Account:
 
     @property
     def is_reverse(self):
-        return 'esoda' in self.chart.account_type(self)
+        return any(i in ('esoda', 'ypoxreoseis', 'kefalaio') for i in self.chart.account_type(self))
 
     @property
     def name_length(self):
