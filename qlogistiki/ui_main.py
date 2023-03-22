@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+## Created by: Qt User Interface Compiler version 6.4.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -18,8 +18,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QDateEdit,
     QFrame, QHBoxLayout, QHeaderView, QLabel,
-    QMainWindow, QPushButton, QSizePolicy, QSplitter,
-    QTableView, QVBoxLayout, QWidget)
+    QMainWindow, QPushButton, QRadioButton, QSizePolicy,
+    QSpacerItem, QSplitter, QTableView, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -176,6 +177,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.btn_open, 0, Qt.AlignLeft|Qt.AlignBottom)
 
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer)
+
         self.date_filter = QDateEdit(self.fr3_bottom)
         self.date_filter.setObjectName(u"date_filter")
         self.date_filter.setEnabled(False)
@@ -190,6 +195,39 @@ class Ui_MainWindow(object):
         self.chk_filter_enable.setLayoutDirection(Qt.RightToLeft)
 
         self.horizontalLayout_2.addWidget(self.chk_filter_enable)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
+
+        self.rbminas = QRadioButton(self.fr3_bottom)
+        self.rbminas.setObjectName(u"rbminas")
+        self.rbminas.setMaximumSize(QSize(70, 16777215))
+
+        self.horizontalLayout_2.addWidget(self.rbminas)
+
+        self.rbtrimino = QRadioButton(self.fr3_bottom)
+        self.rbtrimino.setObjectName(u"rbtrimino")
+        self.rbtrimino.setMaximumSize(QSize(80, 16777215))
+
+        self.horizontalLayout_2.addWidget(self.rbtrimino)
+
+        self.rbejamino = QRadioButton(self.fr3_bottom)
+        self.rbejamino.setObjectName(u"rbejamino")
+        self.rbejamino.setMaximumSize(QSize(80, 16777215))
+
+        self.horizontalLayout_2.addWidget(self.rbejamino)
+
+        self.rbetos = QRadioButton(self.fr3_bottom)
+        self.rbetos.setObjectName(u"rbetos")
+        self.rbetos.setMaximumSize(QSize(80, 16777215))
+        self.rbetos.setChecked(True)
+
+        self.horizontalLayout_2.addWidget(self.rbetos)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_3)
 
         self.btn_check_rest = QPushButton(self.fr3_bottom)
         self.btn_check_rest.setObjectName(u"btn_check_rest")
@@ -211,6 +249,10 @@ class Ui_MainWindow(object):
         self.lbl_account.setText(QCoreApplication.translate("MainWindow", u":)", None))
         self.btn_open.setText(QCoreApplication.translate("MainWindow", u"open", None))
         self.chk_filter_enable.setText("")
+        self.rbminas.setText(QCoreApplication.translate("MainWindow", u"\u039c\u03ae\u03bd\u03b1\u03c2", None))
+        self.rbtrimino.setText(QCoreApplication.translate("MainWindow", u"\u03a4\u03c1\u03af\u03bc\u03b7\u03bd\u03bf", None))
+        self.rbejamino.setText(QCoreApplication.translate("MainWindow", u"\u0395\u03be\u03ac\u03bc\u03b7\u03bd\u03bf", None))
+        self.rbetos.setText(QCoreApplication.translate("MainWindow", u"\u0388\u03c4\u03bf\u03c2", None))
         self.btn_check_rest.setText(QCoreApplication.translate("MainWindow", u"\u0388\u03bb\u03b5\u03b3\u03c7\u03bf\u03c2 \u03c5\u03c0\u03bf\u03bb\u03bf\u03af\u03c0\u03c9\u03bd", None))
     # retranslateUi
 

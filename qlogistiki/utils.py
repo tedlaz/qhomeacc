@@ -1,5 +1,5 @@
 from collections import namedtuple
-from datetime import timedelta
+from datetime import date, timedelta
 from decimal import ROUND_HALF_UP, ROUND_UP, Decimal
 
 
@@ -152,7 +152,7 @@ def dec2gr(anum):
 
 def f2gr(number):
     if number == 0:
-        return ''
+        return ""
     return f"{number:,.2f}".replace(",", "|").replace(".", ",").replace("|", ".")
 
 
@@ -163,3 +163,39 @@ def days_list(dapo, deos):
         day = dapo + timedelta(days=i)
         dlist.append(day)
     return dlist
+
+
+def months_between(yapo, mapo, yeos, meos):
+    yapo, mapo = yapo, mapo
+    yeos, meos = yeos, meos
+    flist = []
+    iyapo = int(yapo)
+    iyeos = int(yeos)
+    imapo = int(mapo)
+    imeos = int(meos)
+    for y in range(iyapo, iyeos + 1):
+        for m in range(1, 13):
+            if y == iyapo and m < imapo:
+                continue
+            if y == iyeos and m > imeos:
+                continue
+            val = f"{y}{m:02d}"
+            flist.append(val)
+    return flist
+
+
+def months_between_ym(ymapo, ymeos):
+    yapo = ymapo[:4]
+    mapo = ymapo[4:]
+    yeos = ymeos[:4]
+    meos = ymeos[4:]
+    return months_between(yapo, mapo, yeos, meos)
+
+
+def isodate2ym(isodate: str) -> str:
+    year, month, date = isodate.split("-")
+    return f"{year}{month}"
+
+
+def date2int(dat: date):
+    return int(dat.isoformat().replace("-", ""))
